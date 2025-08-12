@@ -1,3 +1,4 @@
-fastapi
-uvicorn
 argparse
+requests
+ascii_magic
+pillow
