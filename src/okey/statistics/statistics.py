@@ -4,14 +4,14 @@ import io
 from PIL import Image
 import ascii_magic
 
-# Chemin vers dossier images
+
 IMAGES_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "images"))
 
-# Chemin vers JSON joueurs
+
 PLAYERS_JSON_PATH = os.path.join(os.path.dirname(__file__), "playerStats.json")
 
 def load_player_filenames():
-    """Charge playerStats.json et crée un dict slug -> filename"""
+    """Load playerStats.json and create a dict slug -> filename"""
     with open(PLAYERS_JSON_PATH, encoding="utf-8") as f:
         players = json.load(f)
 
@@ -24,22 +24,22 @@ def load_player_filenames():
     return slug_to_filename
 
 def print_player_ascii(player_slug: str, full_size=False):
-    """Affiche l'image ASCII du joueur donné par son slug"""
+    """Return the ASCII art of a player image based on their slug."""
     slug_to_filename = load_player_filenames()
 
     if player_slug not in slug_to_filename:
-        print(f"[❌] Joueur introuvable dans la liste JSON : {player_slug}")
+        print(f"[❌]Player not found in the json file : {player_slug}")
         return
 
     file_name = slug_to_filename[player_slug]
     file_path = os.path.join(IMAGES_FOLDER, file_name)
 
     if not os.path.exists(file_path):
-        print(f"[❌] Image introuvable pour le joueur '{player_slug}' : {file_path}")
+        print(f"[❌] Image not found for the player '{player_slug}' : {file_path}")
         return
 
     try:
-        # Force 60x60 pixels
+
         target_width = 40
         target_height = 15
 
@@ -95,8 +95,34 @@ def print_player_ascii(player_slug: str, full_size=False):
                     pass
 
     except Exception as e:
-        print(f"[⚠] Erreur avec l'image {file_name} : {e}")
+        print(f"[⚠] Error with the image {file_name} : {e}")
 
-if __name__ == "__main__":
-    # Exemple d'utilisation
-    print_player_ascii("lanehutson")
+def last_5_stats(player_slug: str):
+    """Return the last 5 stats of a player."""
+    with open(PLAYERS_JSON_PATH, encoding="utf-8") as f:
+        players = json.load(f)
+
+    for p in players:
+        full_name = p["name"]
+        slug = full_name.replace(" ", "").lower()
+        if slug == player_slug:
+            last5 = p.get("last5Games", [])
+            if not last5:
+                return f"[❌] No last 5 games data available for player '{player_slug}'."
+            else:
+                stats_lines = [f"Last 5 games stats for {full_name}:"]
+                points = 0
+                goals = 0
+                assists = 0
+                plusminus = 0
+                pims = 0
+                shots = 0
+                for game in last5:
+                    points += game.get("points", 0)
+                    goals += game.get("goals", 0)
+                    assists += game.get("assists", 0)
+                    plusminus += game.get("plusMinus", 0)
+                    pims += game.get("pim", 0)
+                    shots += game.get("shots", 0)
+                return (f"{stats_lines[0]}\n"f"Total Points: {points}, Goals: {goals}, Assists: {assists}, Plus/Minus: {plusminus}, PIM: {pims}, Shots: {shots}")
+
