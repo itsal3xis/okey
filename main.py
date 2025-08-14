@@ -22,8 +22,9 @@ def main():
     parser.add_argument("-p", "--player", type=str, help="Select a specific player")
     parser.add_argument("-t", "--team", type=str, help="Select a specific team")
     parser.add_argument("-e", "--express", action="store_false", help="Run in express mode with minimal output")
-    parser.add_argument("-a", "--ascii", action="store_true", help="Display full ascii art")
+    parser.add_argument("-A", "--ascii", action="store_true", help="Display full ascii art")
     parser.add_argument("-f", "--fivelast", action="store_true", help="View the last 5 games of the player")
+    parser.add_argument("-a", "--awards", action="store_true", help="Display player awards")
     args = parser.parse_args()
 
     if args.player:
@@ -34,9 +35,15 @@ def main():
             return
 
         stats.print_player_ascii(player_slug, full_size=args.ascii)
+        print("===============================================")
 
         if args.fivelast == True:
             print(stats.last_5_stats(player_slug))
+
+        if args.awards:
+            print(stats.player_awards(player_slug))
+        
+        print("\n")
         
 
 if __name__ == "__main__":
