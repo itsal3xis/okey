@@ -111,6 +111,7 @@ def last_5_stats(player_slug: str):
                 return f"[❌] No last 5 games data available for player '{player_slug}'."
             else:
                 stats_lines = [f"Last 5 games stats for {full_name}:"]
+                gamesplayed = 0
                 points = 0
                 goals = 0
                 assists = 0
@@ -118,11 +119,37 @@ def last_5_stats(player_slug: str):
                 pims = 0
                 shots = 0
                 for game in last5:
+                    gamesplayed += 1
                     points += game.get("points", 0)
                     goals += game.get("goals", 0)
                     assists += game.get("assists", 0)
                     plusminus += game.get("plusMinus", 0)
-                    pims += game.get("pim", 0)
+                    pims += game.get("pims", 0)
                     shots += game.get("shots", 0)
+
+                    stats_lines.append(
+                        f"Game {gamesplayed}: Points: {game.get('points', 0)}, "
+                        f"Goals: {game.get('goals', 0)}, Assists: {game.get('assists', 0)}, "
+                        f"Plus/Minus: {game.get('plusMinus', 0)}, PIM: {game.get('pims', 0)}, "
+                        f"Shots: {game.get('shots', 0)}"
+                    )
                 return (f"{stats_lines[0]}\n"f"Total Points: {points}, Goals: {goals}, Assists: {assists}, Plus/Minus: {plusminus}, PIM: {pims}, Shots: {shots}")
 
+def player_awards(player_slug: str):
+    """Return the awards of a player."""
+    with open(PLAYERS_JSON_PATH, encoding="utf-8") as f:
+        players = json.load(f)
+
+    for p in players:
+        full_name = p["name"]
+        slug = full_name.replace(" ", "").lower()
+        if slug == player_slug:
+            awards = p.get("awards", [])
+            if not awards:
+                return f"[❌] No awards for '{player_slug}'."
+            else:
+                award_lines = [f"Awards for {full_name}:"]
+                for award in awards:
+                    award_lines.append(f"- {award}")
+                return "\n".join(award_lines)
+    return f"[❌] Player '{player_slug}' not found."
