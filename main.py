@@ -42,6 +42,10 @@ def main():
 
         if args.awards:
             print(stats.player_awards(player_slug))
+
+    if args.team:
+        team_slug = args.team.lower().replace(" ", "")
+        team = stats.get_team_by_slug(team_slug)
         
         print("\n")
         

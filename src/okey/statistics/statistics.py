@@ -10,6 +10,8 @@ IMAGES_FOLDER = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "i
 
 PLAYERS_JSON_PATH = os.path.join(os.path.dirname(__file__), "playerStats.json")
 
+TEAMS_JSON_PATH = os.path.join(os.path.dirname(__file__), "teamsStats.json")
+
 def load_player_filenames():
     """Load playerStats.json and create a dict slug -> filename"""
     with open(PLAYERS_JSON_PATH, encoding="utf-8") as f:
@@ -153,3 +155,29 @@ def player_awards(player_slug: str):
                     award_lines.append(f"- {award}")
                 return "\n".join(award_lines)
     return f"[❌] Player '{player_slug}' not found."
+
+
+def team_stats(team_slug: str):
+    """Return the stats of a team."""
+    with open(TEAMS_JSON_PATH, encoding="utf-8") as f:
+        teams = json.load(f)
+
+    for t in teams:
+        full_name = t["name"]
+        slug = full_name.replace(" ", "").lower()
+        if slug == team_slug:
+            wins = t.get("wins", 0)
+            losses = t.get("losses", 0)
+            ot_losses = t.get("ot_losses", 0)
+            points = t.get("points", 0)
+            goals_for = t.get("goals_for", 0)
+            goals_against = t.get("goals_against", 0)
+
+            return (f"Stats for {full_name}:\n"
+                    f"Wins: {wins}\n"
+                    f"Losses: {losses}\n"
+                    f"OT Losses: {ot_losses}\n"
+                    f"Points: {points}\n"
+                    f"Goals For: {goals_for}\n"
+                    f"Goals Against: {goals_against}")
+    return f"[❌] Team '{team_slug}' not found."
