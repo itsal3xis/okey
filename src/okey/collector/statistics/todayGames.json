@@ -1,0 +1,197 @@
+[
+  {
+    "date": "2025-11-28",
+    "venue": "Little Caesars Arena",
+    "startTimeUTC": "2025-11-28T17:00:00Z",
+    "homeTeam": {
+      "name": "Detroit Red Wings",
+      "abbrev": "DET"
+    },
+    "awayTeam": {
+      "name": "Tampa Bay Lightning",
+      "abbrev": "TBL"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "TD Garden",
+    "startTimeUTC": "2025-11-28T18:00:00Z",
+    "homeTeam": {
+      "name": "Boston Bruins",
+      "abbrev": "BOS"
+    },
+    "awayTeam": {
+      "name": "New York Rangers",
+      "abbrev": "NYR"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Grand Casino Arena",
+    "startTimeUTC": "2025-11-28T20:30:00Z",
+    "homeTeam": {
+      "name": "Minnesota Wild",
+      "abbrev": "MIN"
+    },
+    "awayTeam": {
+      "name": "Colorado Avalanche",
+      "abbrev": "COL"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "KeyBank Center",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "Buffalo Sabres",
+      "abbrev": "BUF"
+    },
+    "awayTeam": {
+      "name": "New Jersey Devils",
+      "abbrev": "NJD"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Amerant Bank Arena",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "Florida Panthers",
+      "abbrev": "FLA"
+    },
+    "awayTeam": {
+      "name": "Calgary Flames",
+      "abbrev": "CGY"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "UBS Arena",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "New York Islanders",
+      "abbrev": "NYI"
+    },
+    "awayTeam": {
+      "name": "Philadelphia Flyers",
+      "abbrev": "PHI"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Enterprise Center",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "St. Louis Blues",
+      "abbrev": "STL"
+    },
+    "awayTeam": {
+      "name": "Ottawa Senators",
+      "abbrev": "OTT"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "T-Mobile Arena",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "Vegas Golden Knights",
+      "abbrev": "VGK"
+    },
+    "awayTeam": {
+      "name": "Montréal Canadiens",
+      "abbrev": "MTL"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Honda Center",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "Anaheim Ducks",
+      "abbrev": "ANA"
+    },
+    "awayTeam": {
+      "name": "Los Angeles Kings",
+      "abbrev": "LAK"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "SAP Center at San Jose",
+    "startTimeUTC": "2025-11-28T21:00:00Z",
+    "homeTeam": {
+      "name": "San Jose Sharks",
+      "abbrev": "SJS"
+    },
+    "awayTeam": {
+      "name": "Vancouver Canucks",
+      "abbrev": "VAN"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Capital One Arena",
+    "startTimeUTC": "2025-11-28T22:00:00Z",
+    "homeTeam": {
+      "name": "Washington Capitals",
+      "abbrev": "WSH"
+    },
+    "awayTeam": {
+      "name": "Toronto Maple Leafs",
+      "abbrev": "TOR"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Lenovo Center",
+    "startTimeUTC": "2025-11-28T22:00:00Z",
+    "homeTeam": {
+      "name": "Carolina Hurricanes",
+      "abbrev": "CAR"
+    },
+    "awayTeam": {
+      "name": "Winnipeg Jets",
+      "abbrev": "WPG"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "Nationwide Arena",
+    "startTimeUTC": "2025-11-29T00:00:00Z",
+    "homeTeam": {
+      "name": "Columbus Blue Jackets",
+      "abbrev": "CBJ"
+    },
+    "awayTeam": {
+      "name": "Pittsburgh Penguins",
+      "abbrev": "PIT"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "United Center",
+    "startTimeUTC": "2025-11-29T01:00:00Z",
+    "homeTeam": {
+      "name": "Chicago Blackhawks",
+      "abbrev": "CHI"
+    },
+    "awayTeam": {
+      "name": "Nashville Predators",
+      "abbrev": "NSH"
+    }
+  },
+  {
+    "date": "2025-11-28",
+    "venue": "American Airlines Center",
+    "startTimeUTC": "2025-11-29T01:00:00Z",
+    "homeTeam": {
+      "name": "Dallas Stars",
+      "abbrev": "DAL"
+    },
+    "awayTeam": {
+      "name": "Utah Mammoth",
+      "abbrev": "UTA"
+    }
+  }
+]

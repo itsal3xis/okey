@@ -1,4 +1,4 @@
 argparse
 requests
-ascii_magic
-pillow
+pandas
+numpy
