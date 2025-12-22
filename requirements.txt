@@ -2,3 +2,5 @@ argparse
 requests
 pandas
 numpy
+rich
+pillow

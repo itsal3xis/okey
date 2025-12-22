@@ -5,50 +5,8 @@ import sys
 import time
 from datetime import datetime
 from src.okey.collector.collector import collector, reg_season
+from src.okey.collector.analyst import player_info, print_colored
 
-# ANSI Colors
-RESET = '\033[0m'
-RED = '\033[91m'
-GREEN = '\033[92m'
-YELLOW = '\033[93m'
-BLUE = '\033[94m'
-PURPLE = '\033[95m'
-CYAN = '\033[96m'
-WHITE = '\033[97m'
-BOLD = '\033[1m'
-
-ERROR = "ERROR"
-WARNING = "WARNING"
-SUCCESS = "SUCCESS"
-INFO = "INFO"
-
-ROOT = os.path.dirname(os.path.abspath(__file__))
-STAT_DIR = os.path.join(ROOT, "src", "okey", "collector", "statistics")
-
-TODAY_PATH = os.path.join(STAT_DIR, "todayGames.json")
-TEAMS_PATH = os.path.join(STAT_DIR, "teamsStats.json")
-PLAYERS_PATH = os.path.join(STAT_DIR, "playerStats.json")
-
-def print_colored(message: str, status: int = INFO, bold: bool = False):
-    """Print with color and status code"""
-    colors = {
-        ERROR: f"{RED}{BOLD}",
-        WARNING: f"{YELLOW}{BOLD}",
-        SUCCESS: f"{GREEN}{BOLD}",
-        INFO: f"{CYAN}"
-    }
-    color = colors.get(status, '')
-    end_color = RESET if bold else ''
-    
-    prefix = f"[{status}] " if status in [ERROR, WARNING, SUCCESS] else ''
-    print(f"{color}{prefix}{message}{end_color}")
-
-def load_json(path: str):
-    if not os.path.exists(path):
-        print_colored(f"Missing {path}", ERROR)
-        return None
-    with open(path, "r", encoding="utf-8") as f:
-        return json.load(f)
 
 def run_collector(quiet=False, standings_date=None, game_type_id=2, wildcard_indicator=True, season_id=None, log_file=None):
     """Unified collector runner - handles CLI, daemon, logging"""
@@ -111,6 +69,12 @@ if '--background' in sys.argv:
 def main():
     parser = argparse.ArgumentParser(prog="okey", description="OKey - CLI statistics tool for NHL")
     parser.add_argument("-p", "--player", help="Select player by name (Connor McDavid or cmcdavid)")
+    parser.add_argument("-s", "--stats", choices=['basic','advanced','all','bio'], default='basic', help="Stats type to show: basic|advanced|all|bio")
+    parser.add_argument("-I", "--show-image", action="store_true", help="Show player image next to stats (requires rich and pillow)")
+    parser.add_argument("-m", "--image-mode", choices=['auto','half','ansi','rich'], default='auto', help="Image rendering mode: auto|half|ansi|rich")
+    parser.add_argument("--image-width", type=int, default=24, help="Image width in characters")
+    parser.add_argument("--image-size", type=int, default=None, help="Square image size in characters (small square footprint); overrides --image-width")
+    parser.add_argument("-d", "--debug", action="store_true", help="Enable debug output for image rendering")
     parser.add_argument("-c", "--collector", action="store_true", help="Update statistics")
     parser.add_argument("-q", "--quiet", action="store_true", help="Suppress output")
     parser.add_argument("--standings-date", help="Standings date (YYYY-MM-DD)")
@@ -119,28 +83,19 @@ def main():
     args = parser.parse_args()
 
     if args.player:
-        player_name = args.player.lower().replace(" ", "")
-        players_data = load_json(PLAYERS_PATH)
-        if not players_data:
-            return
-    
-        # Search by nameKey first, then fallback to name
-        player_info = None
-        for player in players_data:
-            if player.get("nameKey") == player_name or player.get("name", "").lower().replace(" ", "") == player_name:
-                player_info = player
-                break
-        if not player_info:
-            print_colored(f"Player '{args.player}' not found.", ERROR)
-            return
-        current_season = reg_season()
-        if str(player_info.get("season", "")) != current_season:
-            print_colored(f"Player '{args.player}' has no stats for current season.", WARNING)
-        print_colored(f"\n{player_info.get('name', args.player)} stats:", INFO, bold=True)
-        for key, value in player_info.items():
-            if key not in ['id', 'name', 'team', 'position']:
-                print(f"  {key}: {value}")
-    
+        if args.show_image:
+            # Import here to avoid adding the dependency at module import time
+            from src.okey.collector.analyst import print_player_with_image
+            print_player_with_image(
+                args.player,
+                stat_type=args.stats,
+                debug=args.debug,
+                width=args.image_width,
+                mode=args.image_mode,
+                image_size=args.image_size
+            )
+        else:
+            player_info(args.player, stat_type=args.stats)
     if args.collector:
         run_collector(
             quiet=args.quiet,
