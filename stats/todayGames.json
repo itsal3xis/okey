@@ -1,0 +1,41 @@
+[
+  {
+    "date": "2026-02-01",
+    "venue": "Lenovo Center",
+    "startTimeUTC": "2026-02-01T20:00:00Z",
+    "homeTeam": {
+      "name": "Carolina Hurricanes",
+      "abbrev": "CAR"
+    },
+    "awayTeam": {
+      "name": "Los Angeles Kings",
+      "abbrev": "LAK"
+    }
+  },
+  {
+    "date": "2026-02-01",
+    "venue": "Raymond James Stadium",
+    "startTimeUTC": "2026-02-01T23:30:00Z",
+    "homeTeam": {
+      "name": "Tampa Bay Lightning",
+      "abbrev": "TBL"
+    },
+    "awayTeam": {
+      "name": "Boston Bruins",
+      "abbrev": "BOS"
+    }
+  },
+  {
+    "date": "2026-02-01",
+    "venue": "Honda Center",
+    "startTimeUTC": "2026-02-02T02:30:00Z",
+    "homeTeam": {
+      "name": "Anaheim Ducks",
+      "abbrev": "ANA"
+    },
+    "awayTeam": {
+      "name": "Vegas Golden Knights",
+      "abbrev": "VGK"
+    }
+  }
+]

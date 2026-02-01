@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Players — okey</title>
+    <style>
+      :root{--bg:#071028;--card:#0b1220;--muted:#9fb0c9;--accent:#1fb6ff;--glass:rgba(255,255,255,0.04)}
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{font-family:Inter,system-ui,Arial;color:#e6f0fb;background:radial-gradient(1200px 600px at 10% 10%, rgba(31,80,140,0.12), transparent), linear-gradient(180deg,#041026 0%,#071028 100%);margin:0}
+      .center-wrap{min-height:60vh;display:flex;align-items:center;justify-content:center}
+      .search-card{width:100%;max-width:720px;background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);padding:28px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px)}
+      .search-row{display:flex;gap:8px}
+      .search-row input{flex:1;padding:12px 14px;border-radius:8px;border:1px solid var(--glass);background:transparent;color:inherit}
+      .suggestions{margin-top:8px;background:rgba(255,255,255,0.02);border-radius:8px;overflow:hidden;max-height:320px;overflow-y:auto;border:1px solid rgba(255,255,255,0.03)}
+      .suggestions button{display:flex;gap:10px;align-items:center;width:100%;padding:10px;border:0;background:transparent;color:inherit;text-align:left}
+      .suggestions img{width:40px;height:40px;border-radius:6px;object-fit:cover;background:linear-gradient(135deg,#08304a,#03203a)}
+      .small{color:var(--muted);font-size:13px}
+    </style>
+  </head>
+  <body>
+    <div class="center-wrap">
+      <div class="search-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">Find a player</h2>
+          <div class="small">Type a name or id — results update as you type</div>
+        </div>
+        <div class="search-row">
+          <input id="playerSearch" placeholder="Search player name or id" autocomplete="off">
+          <a href="/players" style="padding:10px 12px;border-radius:8px;background:linear-gradient(90deg,#1fb6ff,#7de2ff);color:#012034;text-decoration:none">All</a>
+        </div>
+        <div id="suggestions" class="suggestions" style="display:none"></div>
+      </div>
+    </div>
+
+    <script>
+      const input = document.getElementById('playerSearch');
+      const suggestions = document.getElementById('suggestions');
+      let timer = null;
+      function clearSuggestions(){ suggestions.innerHTML=''; suggestions.style.display='none'; }
+      function renderResults(items){
+        suggestions.innerHTML = '';
+        if(!items || items.length===0){ clearSuggestions(); return; }
+        items.forEach(p=>{
+          const btn = document.createElement('button');
+          btn.type='button';
+          btn.innerHTML = `<img src="${p.headshot||'/static/placeholder_headshot.png'}" alt=""><div style="flex:1"><div style="font-weight:700">${p.name||p.id}</div><div class=\"small\">${p.team||''} • ${p.id||''}</div></div>`;
+          btn.addEventListener('click', ()=>{
+            const key = p.nameKey || p.id;
+            if(!key) return;
+            window.location.href = '/player/' + encodeURIComponent(key);
+          });
+          suggestions.appendChild(btn);
+        });
+        suggestions.style.display='block';
+      }
+      input.addEventListener('input', ()=>{
+        const q = input.value.trim();
+        if(timer) clearTimeout(timer);
+        if(!q){ clearSuggestions(); return; }
+        timer = setTimeout(()=>{
+          fetch('/_search_players?q=' + encodeURIComponent(q)).then(r=>r.json()).then(data=>{ renderResults(data); }).catch(e=>{ clearSuggestions(); console.warn(e); });
+        }, 180);
+      });
+      document.addEventListener('click', (e)=>{ if(!e.target.closest('.search-card')) clearSuggestions(); });
+      input.addEventListener('keydown', (e)=>{ if(e.key==='Escape') clearSuggestions(); });
+    </script>
+  </body>
+</html>

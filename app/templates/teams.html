@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Standings — okey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+      :root{--bg:#071028;--card:#0b1220;--muted:#9fb0c9;--accent:#1fb6ff;--glass:rgba(255,255,255,0.04)}
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{font-family:Inter,system-ui,Arial;color:#e6f0fb;background:radial-gradient(1200px 600px at 10% 10%, rgba(31,80,140,0.12), transparent), linear-gradient(180deg,#041026 0%,#071028 100%);margin:0}
+      .wrap{max-width:1200px;margin:28px auto;padding:20px}
+      .panel{background:linear-gradient(180deg,rgba(255,255,255,0.015),transparent);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);margin-bottom:18px}
+      .division{display:grid;grid-template-columns:1fr;gap:12px}
+      .standings-row{display:grid;grid-template-columns:48px 1fr 80px 60px 60px 60px 80px;align-items:center;padding:8px;border-radius:8px}
+      .standings-header{color:var(--muted);font-size:13px}
+      .standings-row > div{padding:0 8px;text-align:center}
+      .standings-row > .team-name, .standings-row > div:nth-child(2){text-align:left}
+      .team-name{display:flex;align-items:center;gap:10px}
+      .team-logo{width:36px;height:28px;object-fit:contain}
+      .pos{font-weight:800;width:36px;text-align:center}
+      @media (max-width:920px){.standings-row{grid-template-columns:40px 1fr 60px 50px 50px 50px 60px}}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
+        <div>
+          <h1 style="margin:0;font-size:22px">okey — Standings</h1>
+          <div style="color:var(--muted);font-size:13px">Official-style standings grouped by division</div>
+        </div>
+        <nav>
+          <a href="/" style="color:var(--muted);text-decoration:none;margin-right:10px">Home</a>
+          <a href="/players" style="color:var(--muted);text-decoration:none">Players</a>
+        </nav>
+      </header>
+
+      <section class="panel">
+        <div style="display:flex;gap:12px;align-items:center;justify-content:space-between">
+          <div style="display:flex;gap:8px;align-items:center">
+            <label class="small" style="margin-right:6px">View</label>
+            <select id="viewSelect">
+              <option value="division">Division</option>
+              <option value="conference">Conference</option>
+              <option value="league">League</option>
+            </select>
+            <select id="groupSelect" style="display:none"></select>
+          </div>
+          <div class="small">Click headers to sort • double-click a header to reset</div>
+        </div>
+
+        <div id="standingsContainer" style="margin-top:12px"></div>
+      </section>
+
+    </div>
+
+    <script>
+      // Fetch teams data and render interactive standings
+      (function(){
+        const container = document.getElementById('standingsContainer');
+        const viewSel = document.getElementById('viewSelect');
+        const groupSel = document.getElementById('groupSelect');
+        let teams = [];
+        let sortKey = null;
+        let sortDir = -1; // 1 asc, -1 desc
+
+        function fetchTeams(){
+          fetch('/_teams').then(r=>r.json()).then(data=>{ teams=data; buildGroupOptions(); render(); }).catch(e=>{ console.error(e); container.innerText='Failed to load teams'; });
+        }
+
+        function buildGroupOptions(){
+          const view = viewSel.value;
+          const groups = new Set();
+          if(view==='division') teams.forEach(t=>groups.add(t.division||t.divisionAbbrev||t.conference||'Unknown'));
+          else if(view==='conference') teams.forEach(t=>groups.add(t.conference||t.conferenceAbbrev||'Unknown'));
+          else if(view==='league') groups.add('All Teams');
+          groupSel.innerHTML='';
+          Array.from(groups).sort().forEach(g=>{ const o=document.createElement('option'); o.value=g; o.textContent=g; groupSel.appendChild(o); });
+          groupSel.style.display = (view==='division' || view==='conference') ? 'inline-block' : 'none';
+        }
+
+        function getVal(item, key){
+          if(!item) return 0;
+          // support nested fallbacks for some keys
+          if(key==='otLosses') return item.otLosses ?? item.shootoutLosses ?? 0;
+          return item[key] ?? 0;
+        }
+
+        function cmp(a,b){
+          const va = getVal(a, sortKey);
+          const vb = getVal(b, sortKey);
+          if(typeof va === 'string' || typeof vb === 'string') return String(va).localeCompare(String(vb)) * sortDir;
+          return (va - vb) * sortDir;
+        }
+
+        function render(){
+          const view = viewSel.value;
+          const group = groupSel.value;
+          container.innerHTML='';
+
+          if(view==='division' || view==='conference'){
+            // group teams by selected field and show positions
+            const key = view==='division' ? 'division' : 'conference';
+            const groups = {};
+            teams.forEach(t=>{ const g = t[key]||t[key+'Abbrev']||'Unknown'; groups[g]=groups[g]||[]; groups[g].push(t); });
+            const keys = group ? [group] : Object.keys(groups).sort();
+            keys.forEach(k=>{
+              const list = groups[k] || [];
+                // apply active sort if set, otherwise default to view-specific sequence then points
+                if(sortKey){
+                  list.sort(cmp);
+                }else{
+                  if(view==='division'){
+                    list.sort((a,b)=>{ const sa = (a.divisionSequence ?? 999); const sb = (b.divisionSequence ?? 999); if(sa!==sb) return sa - sb; return (b.points||0) - (a.points||0); });
+                  }else if(view==='conference'){
+                    list.sort((a,b)=>{ const sa = (a.conferenceSequence ?? 999); const sb = (b.conferenceSequence ?? 999); if(sa!==sb) return sa - sb; return (b.points||0) - (a.points||0); });
+                  }else{
+                    list.sort((a,b)=> (b.points||0)-(a.points||0));
+                  }
+                }
+              container.appendChild(renderDivision(k, list));
+            });
+          }else{
+            let list = teams.slice();
+            if(view==='league'){
+              if(sortKey){ list.sort(cmp); } else { list.sort((a,b)=> (b.points||0)-(a.points||0)); }
+            }else if(view==='wildcard'){
+              // prefer wildcardSequence if present, otherwise sort by points
+              if(sortKey){ list.sort(cmp); }
+              else if(list.some(t=>t.wildcardSequence!==undefined)){
+                list.sort((a,b)=> (a.wildcardSequence||999)-(b.wildcardSequence||999));
+              } else {
+                list.sort((a,b)=> (b.points||0)-(a.points||0));
+              }
+            }
+            container.appendChild(renderDivision(view==='league'?'League':'Wildcard', list));
+          }
+        }
+
+        function renderDivision(title, list){
+          const wrap = document.createElement('div');
+          const header = document.createElement('div'); header.style.margin='8px 0'; header.innerHTML = `<div style="font-weight:800">${title}</div>`; wrap.appendChild(header);
+            const head = document.createElement('div'); head.className='standings-row standings-header';
+          const cols = [
+            {label:'#', key:'pos'},
+            {label:'Team', key:'teamCommonName'},
+            {label:'GP', key:'gamesPlayed'},
+            {label:'W', key:'wins'},
+            {label:'L', key:'losses'},
+            {label:'OT', key:'otLosses'},
+            {label:'PTS', key:'points'},
+          ];
+          cols.forEach((c, idx)=>{
+            const el = document.createElement('div'); el.textContent = c.label; if(idx===0) el.className='pos';
+            // make sortable (except position and Team label)
+            if(c.key && c.key!=='pos' && c.key!=='teamCommonName'){
+              el.style.cursor='pointer'; el.title='Click to sort';
+              el.addEventListener('click', ()=>{ if(sortKey===c.key) sortDir = -sortDir; else { sortKey = c.key; sortDir = -1; } render(); });
+              el.addEventListener('dblclick', ()=>{ sortKey = null; sortDir = 1; render(); });
+            }
+            head.appendChild(el);
+          });
+          wrap.appendChild(head);
+
+          list.forEach((t, i)=>{
+            const row = document.createElement('div'); row.className='standings-row'; row.style.background='rgba(255,255,255,0.01)'; row.style.border='1px solid rgba(255,255,255,0.02)';
+            // position: respect view context — division uses divisionSequence, conference uses conferenceSequence, league/wildcard use index
+            let posText = '';
+            if(title && (viewSel.value==='division')) posText = t.divisionSequence ?? (i+1);
+            else if(title && (viewSel.value==='conference')) posText = t.conferenceSequence ?? (i+1);
+            else posText = (i+1);
+            const pos = document.createElement('div'); pos.className='pos'; pos.textContent = posText;
+            const teamname = document.createElement('div'); teamname.className='team-name';
+            if(t.teamLogo){ const img = document.createElement('img'); img.src=t.teamLogo; img.className='team-logo'; teamname.appendChild(img); }
+            const info = document.createElement('div'); info.innerHTML = `<div style="font-weight:800">${t.teamCommonName||t.team}</div><div style="color:var(--muted);font-size:12px">${t.placeName||''}</div>`;
+            teamname.appendChild(info);
+            const gp = document.createElement('div'); gp.style.textAlign='center'; gp.textContent = t.gamesPlayed||'';
+            const w = document.createElement('div'); w.style.textAlign='center'; w.textContent = t.wins||0;
+            const l = document.createElement('div'); l.style.textAlign='center'; l.textContent = t.losses||0;
+            const ot = document.createElement('div'); ot.style.textAlign='center'; ot.textContent = t.otLosses||t.shootoutLosses||0;
+            const pts = document.createElement('div'); pts.style.textAlign='center'; pts.style.fontWeight='800'; pts.textContent = t.points||0;
+            [pos, teamname, gp, w, l, ot, pts].forEach(e=>row.appendChild(e));
+            wrap.appendChild(row);
+          });
+          return wrap;
+        }
+
+        // wire up controls
+        viewSel.addEventListener('change', ()=>{ sortKey = null; sortDir = -1; buildGroupOptions(); render(); });
+        groupSel.addEventListener('change', render);
+
+        fetchTeams();
+      })();
+    </script>
+    </div>
+  </body>
+</html>

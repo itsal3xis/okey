@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ p.name }} — okey</title>
+  </head>
+  <body>
+    <a href="/players">← back</a>
+    <h1>{{ p.name }}</h1>
+    {% if p.headshot %}<img src="{{ p.headshot }}" width="150"><br>{% endif %}
+    <b>Team:</b> {{ p.team }}<br>
+    <b>Position:</b> {{ p.position }}<br>
+    <b>Season:</b> {{ p.season }}<br>
+    <h2>Stats</h2>
+    <ul>
+      <li>Games Played: {{ p.gamesPlayed }}</li>
+      <li>Goals: {{ p.goals }}</li>
+      <li>Assists: {{ p.assists }}</li>
+      <li>Points: {{ p.points }}</li>
+      <li>+/-: {{ p.plusMinus }}</li>
+    </ul>
+    <h2>Awards</h2>
+    {% if p.awards and p.awards|length>0 %}
+      <ul>{% for a in p.awards %}<li>{{ a.trophy }} — {{ a.seasons }}</li>{% endfor %}</ul>
+    {% else %}
+      <p>No awards listed.</p>
+    {% endif %}
+  </body>
+</html>

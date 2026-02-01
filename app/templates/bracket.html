@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>If The Playoffs Started Today — okey</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+      :root{--bg:#111;--panel:#1a1a1a;--muted:#9aa8b8;--accent:#5dd4ff}
+      html,body{height:100%}
+      body{font-family:Inter,system-ui,Arial;color:#fff;background:linear-gradient(180deg,#0b0b0b 0%,#0f1112 100%);margin:0}
+      .wrap{max-width:1400px;margin:22px auto;padding:18px}
+      header{display:flex;justify-content:center;align-items:center;flex-direction:column}
+      header h1{margin:6px 0 2px;font-size:28px}
+      header p{margin:0;color:var(--muted);font-size:13px}
+
+      .board{display:grid;grid-template-columns:320px 120px 180px 120px 320px;grid-template-rows:80px 110px 80px 220px 80px 110px 80px;gap:18px;align-items:start;margin-top:24px}
+
+      .bracket-col{display:flex;flex-direction:column}
+      .match-box{background:var(--panel);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid rgba(255,255,255,0.03)}
+      .team-row{display:flex;align-items:center;justify-content:space-between}
+      .team-left{display:flex;align-items:center;gap:10px}
+      .logo{width:36px;height:28px;display:inline-block;background:#222;border-radius:4px;object-fit:contain}
+      .team-name{font-weight:700}
+      .team-place{font-size:12px;color:var(--muted)}
+      .points{font-weight:800;color:#e9f6ff}
+
+      /* center column */
+      .center{display:flex;flex-direction:column;align-items:center;gap:18px}
+      .trophy{width:170px;height:260px;background:linear-gradient(180deg,#0c0c0c,#1b1b1b);border-radius:12px;border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center}
+      .trophy svg{width:120px;height:200px;opacity:0.95}
+
+      /* small round round labels */
+      .round-label{font-size:12px;color:var(--muted);font-weight:700;margin-bottom:6px;text-align:center}
+
+      /* responsive */
+      @media (max-width:1000px){.board{grid-template-columns:1fr 160px 1fr}.bracket-col{height:520px}}
+      @media (max-width:720px){.board{grid-template-columns:1fr;gap:12px}.center{order:3}.bracket-col{height:auto}}
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>If The Playoffs Started Today</h1>
+        <p>Matchups update after each game ends</p>
+      </header>
+
+      <div class="board">
+        {% set confs = bracket.items()|list %}
+        {% set left = confs[0] if confs|length>0 else ('West', {'upper':[], 'lower':[]}) %}
+        {% set right = confs[1] if confs|length>1 else ('East', {'upper':[], 'lower':[]}) %}
+
+        {# place matches explicitly into a 5-column grid so upper/lower groups align #}
+        {# left column matches: indices 0..3 -> rows 1,2,6,7 #}
+        {# Render left upper (top winner vs wild) in row1 and its 2v3 below in row2 #}
+        {% set up = left[1].upper if left[1].upper is defined else [] %}
+        {% set low = left[1].lower if left[1].lower is defined else [] %}
+        {% set top_match = up[0] if up|length>0 else (None,None,None,None) %}
+        {% set top_2v3 = up[1] if up|length>1 else (None,None,None,None) %}
+
+        <div style="grid-column:1;grid-row:1;">
+          {% set seedA, a, seedB, b = top_match %}
+          <div class="match-box">
+            <div class="team-row">
+              <div class="team-left">
+                {% if a and a.teamLogo %}<img src="{{ a.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ a.teamCommonName or a.team if a else 'TBD' }}</div>
+                  <div class="team-place">{{ a.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ a.points or '' }}</div>
+            </div>
+            <div style="height:6px"></div>
+            <div class="team-row">
+              <div class="team-left">
+                {% if b and b.teamLogo %}<img src="{{ b.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ b.teamCommonName or b.team if b else 'TBD' }}</div>
+                  <div class="team-place">{{ b.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ b.points or '' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="grid-column:1;grid-row:2;">
+          {% set seedA, a, seedB, b = top_2v3 %}
+          <div class="match-box">
+            <div class="team-row">
+              <div class="team-left">
+                {% if a and a.teamLogo %}<img src="{{ a.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ a.teamCommonName or a.team if a else 'TBD' }}</div>
+                  <div class="team-place">{{ a.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ a.points or '' }}</div>
+            </div>
+            <div style="height:6px"></div>
+            <div class="team-row">
+              <div class="team-left">
+                {% if b and b.teamLogo %}<img src="{{ b.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ b.teamCommonName or b.team if b else 'TBD' }}</div>
+                  <div class="team-place">{{ b.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ b.points or '' }}</div>
+            </div>
+          </div>
+        </div>
+
+        {# left upper R2 #}
+        <div style="grid-column:2;grid-row:3;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:100px;height:70px;display:flex;align-items:center;justify-content:center;color:var(--muted)">R2</div>
+        </div>
+
+        {# left CF label #}
+        <div style="grid-column:2;grid-row:4;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:140px;height:90px;display:flex;align-items:center;justify-content:center;color:var(--muted)">CF</div>
+        </div>
+
+        {# left lower R2 #}
+        <div style="grid-column:2;grid-row:5;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:100px;height:70px;display:flex;align-items:center;justify-content:center;color:var(--muted)">R2</div>
+        </div>
+
+        {# center trophy #}
+        <div style="grid-column:3;grid-row:4;display:flex;align-items:center;justify-content:center">
+          <div class="trophy" title="Stanley Cup">
+            <svg viewBox="0 0 64 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="8" width="36" height="56" rx="6" fill="#0f1720" stroke="#2d3748"/>
+              <path d="M21 64c2 6 8 10 11 10s9-4 11-10" stroke="#98c4d8" stroke-width="1.8" stroke-linecap="round"/>
+              <rect x="22" y="4" width="20" height="8" rx="2" fill="#98c4d8" opacity="0.14"/>
+            </svg>
+          </div>
+        </div>
+
+        {# right upper R2 #}
+        <div style="grid-column:4;grid-row:3;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:100px;height:70px;display:flex;align-items:center;justify-content:center;color:var(--muted)">R2</div>
+        </div>
+
+        {# right CF label #}
+        <div style="grid-column:4;grid-row:4;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:140px;height:90px;display:flex;align-items:center;justify-content:center;color:var(--muted)">CF</div>
+        </div>
+
+        {# right lower R2 #}
+        <div style="grid-column:4;grid-row:5;display:flex;align-items:center;justify-content:center">
+          <div class="match-box" style="width:100px;height:70px;display:flex;align-items:center;justify-content:center;color:var(--muted)">R2</div>
+        </div>
+
+        {# Render right upper and lower groups symmetrically #}
+        {% set up_r = right[1].upper if right[1].upper is defined else [] %}
+        {% set low_r = right[1].lower if right[1].lower is defined else [] %}
+        {% set top_match_r = up_r[0] if up_r|length>0 else (None,None,None,None) %}
+        {% set top_2v3_r = up_r[1] if up_r|length>1 else (None,None,None,None) %}
+
+        <div style="grid-column:5;grid-row:1;">
+          {% set seedA, a, seedB, b = top_match_r %}
+          <div class="match-box">
+            <div class="team-row">
+              <div class="team-left">
+                {% if a and a.teamLogo %}<img src="{{ a.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ a.teamCommonName or a.team if a else 'TBD' }}</div>
+                  <div class="team-place">{{ a.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ a.points or '' }}</div>
+            </div>
+            <div style="height:6px"></div>
+            <div class="team-row">
+              <div class="team-left">
+                {% if b and b.teamLogo %}<img src="{{ b.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ b.teamCommonName or b.team if b else 'TBD' }}</div>
+                  <div class="team-place">{{ b.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ b.points or '' }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="grid-column:5;grid-row:2;">
+          {% set seedA, a, seedB, b = top_2v3_r %}
+          <div class="match-box">
+            <div class="team-row">
+              <div class="team-left">
+                {% if a and a.teamLogo %}<img src="{{ a.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ a.teamCommonName or a.team if a else 'TBD' }}</div>
+                  <div class="team-place">{{ a.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ a.points or '' }}</div>
+            </div>
+            <div style="height:6px"></div>
+            <div class="team-row">
+              <div class="team-left">
+                {% if b and b.teamLogo %}<img src="{{ b.teamLogo }}" class="logo">{% else %}<div class="logo"></div>{% endif %}
+                <div>
+                  <div class="team-name">{{ b.teamCommonName or b.team if b else 'TBD' }}</div>
+                  <div class="team-place">{{ b.placeName or '' }}</div>
+                </div>
+              </div>
+              <div class="points">{{ b.points or '' }}</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>
